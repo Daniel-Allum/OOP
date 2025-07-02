@@ -15,6 +15,5 @@ class Item:
     def get_description(self):
         return self.description
 
-
-def describe(self):
-    print ("The [" + self.name + "] is here - " + self.description)
+    def describe(self):
+        print ("The [" + self.name + "] is here - " + self.description)
