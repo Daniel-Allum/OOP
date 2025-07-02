@@ -47,7 +47,7 @@ while dead == False:
     command = input("> ")
     current_cave = current_cave.move(command)
     if command in ['north', 'south', 'east', 'west']:
-            current_cave = current_cave.move(command)
+        current_cave = current_cave.move(command)
     elif command == 'talk':
         if inhabitant is not None:
             inhabitant.talk()
