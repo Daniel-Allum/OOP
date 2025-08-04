@@ -70,12 +70,4 @@ class Character:
         if self.health > self.max_health:
             self.health = self.max_health
         print("Your health is now: " + str(self.health))
-
-    def show_inventory(self):
-        if not self.inventory:
-            print("You are not carrying anything.")
-            return
-        print("You are carrying:")
-        for item in self.inventory:
-            print("- " + item.get_name() + " (" + str(item.get_weight()) + "kg)")
-        print("Total weight: " + str(self.get_current_weight()) + "kg")
+        
