@@ -1,10 +1,10 @@
 class Room:
     def __init__(self, room_name):
-        self.name == room_name
+        self.name = room_name
         self.description = None
         self.linked_rooms = {}
         self.character = None
-        self.item = None
+        self.item = None  # This should store an Item object
 
     def set_description(self, room_description):
         self.description = room_description
@@ -24,8 +24,15 @@ class Room:
     def get_character(self):
         return self.character
 
+    def remove_character(self):
+        self.character = None
+
     def describe(self):
         print(self.description)
+        if self.item:
+            self.item.describe()
+        if self.character:
+            print("You see " + self.character.get_name() + " here.")
 
     def link_room(self, room_to_link, direction):
         self.linked_rooms[direction] = room_to_link
@@ -46,5 +53,5 @@ class Room:
     def get_item(self):
         return self.item
 
-    def set_item(self, item_name):
-        self.item = item_name
+    def set_item(self, item):
+        self.item = item
