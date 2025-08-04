@@ -4,7 +4,7 @@ class Room:
         self.description = None
         self.linked_rooms = {}
         self.character = None
-        self.item = None  # This should store an Item object
+        self.item = None
 
     def set_description(self, room_description):
         self.description = room_description
