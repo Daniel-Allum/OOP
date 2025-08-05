@@ -58,7 +58,6 @@ class Key(Item):
         print("You try using the " + self.name + " on the " + self.unlocks + ".")
 
 
-
 class Torch(Item):
     def __init__(self, item_name):
         super().__init__(item_name)
@@ -71,3 +70,16 @@ class Torch(Item):
         else:
             print("You light the torch. The room brightens up.")
             self.lit = True
+
+class Weapon(Item):
+    def __init__(self, name, description, weight, value, damage, weapon_type):
+        super().__init__(name, description, weight, value)
+        self.damage = damage
+        self.weapon_type = weapon_type
+
+    def use(self, target):
+        print(f"You attack {target} with {self.name}, dealing {self.damage} damage.")
+
+    def __str__(self):
+        base = super().__str__()
+        return f"{base} | Type: {self.weapon_type} | Damage: {self.damage}"
