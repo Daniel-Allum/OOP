@@ -29,10 +29,7 @@ class Character:
             print("You stay where you are.")
 
     def get_current_weight(self):
-        total_weight = 0
-        for item in self.inventory:
-            total_weight += item.get_weight()
-        return total_weight
+        return sum(item.get_weight() for item in self.inventory)
 
     def pick_up(self):
         item = self.current_room.get_item()
@@ -47,20 +44,20 @@ class Character:
             return
         self.inventory.append(item)
         self.current_room.set_item(None)
-        print("You picked up the " + item.get_name())
+        print(f"You picked up the {item.get_name()}")
 
-    def drop_item(self, item_name):
+    def drop_item(self, item_short_name):
         for item in self.inventory:
-            if item.get_name().lower() == item_name.lower():
+            if item.get_short_name() == item_short_name.lower():
                 self.inventory.remove(item)
                 self.current_room.set_item(item)
-                print("You dropped the " + item.get_name())
+                print(f"You dropped the {item.get_name()}")
                 return
         print("You don't have that item.")
 
-    def use_item(self, item_name):
+    def use_item(self, item_short_name):
         for item in self.inventory:
-            if item.get_name().lower() == item_name.lower():
+            if item.get_short_name() == item_short_name.lower():
                 item.use(self)
                 return
         print("You don't have that item.")
@@ -69,5 +66,38 @@ class Character:
         self.health += amount
         if self.health > self.max_health:
             self.health = self.max_health
-        print("Your health is now: " + str(self.health))
-        
+        print(f"Your health is now: {self.health}")
+
+
+
+class NPC(Character):
+    def __init__(self, name, starting_room, dialogue=None):
+        super().__init__(name, starting_room)
+        self.dialogue = dialogue or "Hello!"
+
+    def talk(self):
+        print(f"{self.name} says: {self.dialogue}")
+        if self.name.lower() == "luther":
+            print("Hint: The three keys you need to escape are hidden in the Bedroom, Study, and Library.")
+
+
+class Enemy(Character):
+    def __init__(self, name, starting_room, health=50, damage=5, drop_item=None):
+        super().__init__(name, starting_room)
+        self.health = health
+        self.damage = damage
+        self.drop_item = drop_item
+
+    def attack(self, target):
+        if isinstance(target, Character):
+            print(f"{self.name} attacks {target.get_name()} for {self.damage} damage!")
+            target.health -= self.damage
+            if target.health < 0:
+                target.health = 0
+        else:
+            print(f"{self.name} tries to attack, but there's nothing to hit.")
+
+    def on_defeat(self):
+        if self.drop_item:
+            print(f"{self.name} dropped {self.drop_item.get_name()}!")
+            self.current_room.set_item(self.drop_item)

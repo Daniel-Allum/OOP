@@ -1,3 +1,240 @@
+from character import Character, NPC, Enemy
 from room import Room
-from item import Item, HealthPotion, Key, Torch
-from character import Character
+from item import Item, HealthPotion, Key, Torch, Weapon
+
+def setup_world():
+
+    rooms = {}
+    rooms['foyer'] = Room("Foyer")
+    rooms['foyer'].set_description("The dimly lit foyer of the old house. The main exit door is locked tight. Doors lead north and east.")
+
+    rooms['library'] = Room("Library")
+    rooms['library'].set_description("Shelves of dusty books. A faint whisper can be heard.")
+
+    rooms['kitchen'] = Room("Kitchen")
+    rooms['kitchen'].set_description("Old kitchen with broken utensils. There's a foul smell.")
+
+    rooms['hallway'] = Room("Hallway")
+    rooms['hallway'].set_description("A long hallway with flickering lights.")
+
+    rooms['basement'] = Room("Basement")
+    rooms['basement'].set_description("A cold, dark basement. You hear mechanical noises.")
+
+    rooms['study'] = Room("Study")
+    rooms['study'].set_description("A cluttered study with papers scattered everywhere.")
+
+    rooms['bedroom'] = Room("Bedroom")
+    rooms['bedroom'].set_description("A dusty bedroom with a creaky bed.")
+
+    rooms['attic'] = Room("Attic")
+    rooms['attic'].set_description("A cramped attic filled with old furniture.")
+
+    rooms['foyer'].link_room(rooms['library'], 'north')
+    rooms['foyer'].link_room(rooms['kitchen'], 'east')
+
+    rooms['library'].link_room(rooms['foyer'], 'south')
+    rooms['library'].link_room(rooms['hallway'], 'east')
+
+    rooms['kitchen'].link_room(rooms['foyer'], 'west')
+    rooms['kitchen'].link_room(rooms['basement'], 'down')
+
+    rooms['hallway'].link_room(rooms['library'], 'west')
+    rooms['hallway'].link_room(rooms['study'], 'north')
+    rooms['hallway'].link_room(rooms['bedroom'], 'east')
+
+    rooms['basement'].link_room(rooms['kitchen'], 'up')
+
+    rooms['study'].link_room(rooms['hallway'], 'south')
+    rooms['study'].link_room(rooms['attic'], 'up')
+
+    rooms['bedroom'].link_room(rooms['hallway'], 'west')
+
+    rooms['attic'].link_room(rooms['study'], 'down')
+
+    key1 = Key("Rusty Key", "Main Door", short_name="key1")
+    key1.set_description("An old rusty key, looks like it might open the main exit door.")
+    key1.set_weight(1)
+
+    key2 = Key("Silver Key", "Main Door", short_name="key2")
+    key2.set_description("A shiny silver key, seems important.")
+    key2.set_weight(1)
+
+    key3 = Key("Golden Key", "Main Door", short_name="key3")
+    key3.set_description("A golden key with intricate engravings.")
+    key3.set_weight(1)
+
+    potion_small = HealthPotion("Small Health Potion", short_name="potion")
+    potion_small.set_description("A small vial filled with red liquid. Restores some health.")
+    potion_small.set_weight(1)
+
+    potion_large = HealthPotion("Large Health Potion", short_name="bigpotion")
+    potion_large.set_description("A large vial that restores a significant amount of health.")
+    potion_large.set_weight(2)
+
+    torch = Torch("Wooden Torch", short_name="torch")
+    torch.set_description("A wooden torch. Can be lit to brighten dark areas.")
+    torch.set_weight(2)
+
+    sword = Weapon("Rusty Sword", "An old sword with a dull blade.", 4, 0, damage=10, weapon_type="Melee", short_name="sword")
+
+    shotgun = Weapon("Shotgun", "A powerful shotgun with limited shells.", 7, 0, damage=35, weapon_type="Ranged", short_name="shotgun")
+
+    laser_pistol = Weapon("Laser Pistol", "Small laser pistol.", 3, 0, damage=12, weapon_type="Ranged", short_name="laser")
+
+    rooms['kitchen'].set_item(potion_small)
+    rooms['foyer'].set_item(torch)
+    rooms['bedroom'].set_item(key1)
+    rooms['attic'].set_item(shotgun)
+    rooms['study'].set_item(key2)
+    rooms['hallway'].set_item(potion_large)
+    rooms['library'].set_item(key3)
+    rooms['basement'].set_item(sword)
+
+    luther = NPC("Luther", rooms['library'], "I can help you survive this place. Stay alert!")
+    rooms['library'].set_character(luther)
+
+    zlatko = Enemy("Zlatko", rooms['basement'], health=100, damage=20, drop_item=shotgun)
+    zlatko.inventory.append(shotgun)
+    rooms['basement'].set_character(zlatko)
+
+    droid1 = Enemy("Security Droid 1", rooms['hallway'], health=50, damage=10, drop_item=laser_pistol)
+    droid1.inventory.append(laser_pistol)
+    rooms['hallway'].set_character(droid1)
+
+    droid2 = Enemy("Security Droid 2", rooms['kitchen'], health=40, damage=8, drop_item=laser_pistol)
+    droid2.inventory.append(laser_pistol)
+    rooms['kitchen'].set_character(droid2)
+
+    return rooms
+
+def player_has_all_keys(player):
+    keys_found = [item for item in player.inventory if isinstance(item, Key) and item.unlocks == "Main Door"]
+    return len(keys_found) >= 3
+
+def print_help():
+    print("""
+Commands:
+    go [direction]      -- Move in a direction (north, south, east, west, up, down, out)
+    look                -- Look around the current room
+    talk                -- Talk to an NPC in the room
+    attack              -- Attack an enemy in the room
+    take [item]         -- Take an item from the room (or just 'take' to pick up whatever is there)
+    drop [item]         -- Drop an item from your inventory (use short name)
+    inventory           -- Show your inventory
+    use [item]          -- Use an item in your inventory (use short name)
+    health              -- Show your current health
+    help                -- Show this help message
+    quit                -- Exit the game
+""")
+
+def main():
+    rooms = setup_world()
+    player = Character("Player", rooms['foyer'])
+
+    print("Welcome to the Escape House!")
+    print_help()
+    player.current_room.describe()
+
+    while True:
+        command = input("\n> ").strip().lower()
+        if not command:
+            continue
+
+        if command == 'quit':
+            print("Thanks for playing! Goodbye.")
+            break
+
+        elif command.startswith("go "):
+            direction = command[3:]
+            if player.current_room == rooms['foyer'] and direction == "out":
+                if player_has_all_keys(player):
+                    print("You use the three keys to unlock the main door...")
+                    print("The door creaks open and you step outside into freedom.")
+                    print("CONGRATULATIONS! You have escaped the house!")
+                    break
+                else:
+                    print("The main door is locked tight. You need 3 keys to unlock it.")
+                    continue
+            player.move(direction)
+
+        elif command == "look":
+            player.current_room.describe()
+
+        elif command == "talk":
+            character = player.current_room.get_character()
+            if isinstance(character, NPC):
+                character.talk()
+            else:
+                print("There is no one here to talk to.")
+
+        elif command == "attack":
+            character = player.current_room.get_character()
+            if isinstance(character, Enemy):
+                character.attack(player)
+                if player.health <= 0:
+                    print("You have been defeated. Game Over.")
+                    break
+
+                weapon = None
+                for item in player.inventory:
+                    if isinstance(item, Weapon):
+                        weapon = item
+                        break
+                if weapon:
+                    damage = weapon.damage
+                    print(f"You attack {character.get_name()} with {weapon.get_name()}, dealing {damage} damage!")
+                else:
+                    damage = 10
+                    print(f"You attack {character.get_name()} with your fists, dealing {damage} damage!")
+                character.health -= damage
+                if character.health <= 0:
+                    print(f"The {character.get_name()} is defeated!")
+                    character.on_defeat()
+                    player.current_room.remove_character()
+            else:
+                print("There is no enemy here to attack.")
+
+        elif command.startswith("take"):
+            parts = command.split(' ', 1)
+            if len(parts) == 1:
+                player.pick_up()
+            else:
+                requested_name = parts[1].lower()
+                item = player.current_room.get_item()
+                if item is None:
+                    print("There is nothing here to take.")
+                    continue
+                if requested_name == item.get_short_name() or requested_name == item.get_name().lower():
+                    player.pick_up()
+                else:
+                    print(f"There is no '{requested_name}' here to take.")
+
+        elif command.startswith("drop "):
+            item_name = command[5:].lower()
+            player.drop_item(item_name)
+
+        elif command == "inventory":
+            if player.inventory:
+                print("You have:")
+                for item in player.inventory:
+                    print(f" - {item.get_name()} (\"{item.get_short_name()}\")")
+            else:
+                print("Your inventory is empty.")
+            total_weight = player.get_current_weight()
+            print(f"Inventory weight: {total_weight} kg / {player.max_weight} kg")
+
+        elif command.startswith("use "):
+            item_name = command[4:].lower()
+            player.use_item(item_name)
+
+        elif command == "health":
+            print(f"Your health: {player.get_health()}")
+
+        elif command == "help":
+            print_help()
+
+        else:
+            print("I don't understand that command. Type 'help' for a list of commands.")
+
+if __name__ == "__main__":
+    main()

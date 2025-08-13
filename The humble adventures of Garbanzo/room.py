@@ -6,6 +6,12 @@ class Room:
         self.character = None
         self.item = None
 
+    def set_item(self, item):
+        self.item = item
+
+    def get_item(self):
+        return self.item
+
     def set_description(self, room_description):
         self.description = room_description
 
@@ -33,25 +39,22 @@ class Room:
             self.item.describe()
         if self.character:
             print("You see " + self.character.get_name() + " here.")
+        if self.linked_rooms:
+            exits = ", ".join(self.linked_rooms.keys())
+            print(f"Exits: {exits}")
 
     def link_room(self, room_to_link, direction):
         self.linked_rooms[direction] = room_to_link
-
-    def get_details(self):
-        print(self.description)
-        for direction in self.linked_rooms:
-            room = self.linked_rooms[direction]
-            print('The ' + room.get_name() + ' is ' + direction)
 
     def move(self, direction):
         if direction in self.linked_rooms:
             return self.linked_rooms[direction]
         else:
-            print("You can't go that way")
+            print("You can't go that way.")
             return self
 
-    def get_item(self):
-        return self.item
-
-    def set_item(self, item):
-        self.item = item
+    def get_details(self):
+        print(self.description)
+        print("\nExits:")
+        for direction, room in self.linked_rooms.items():
+            print(f"The {room.get_name()} is {direction}")
