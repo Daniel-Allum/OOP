@@ -131,7 +131,7 @@ def main():
     rooms = setup_world()
     player = Character("Player", rooms['foyer'])
 
-    print("Welcome to the Escape House!")
+    print("Welcome to Zlatkos House!")
     print_help()
     player.current_room.describe()
 
