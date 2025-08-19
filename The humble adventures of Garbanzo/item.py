@@ -58,9 +58,14 @@ class Key(Item):
     def __init__(self, name, unlocks_room_name, description=None, weight=1, value=0, short_name=None):
         super().__init__(name, description, weight, value, short_name)
         self.unlocks = unlocks_room_name
+        self.used = False
 
     def use(self, player):
-        print(f"You try using the {self.name} on the {self.unlocks}.")
+        if not self.used:
+            print(f"You use the {self.name} on the {self.unlocks}.")
+            self.used = True
+        else:
+            print(f"The {self.name} has already been used.")
 
 
 class Torch(Item):

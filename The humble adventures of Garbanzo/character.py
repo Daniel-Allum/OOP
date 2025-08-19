@@ -19,13 +19,27 @@ class Character:
     def get_current_room(self):
         return self.current_room
 
+    def display_current_room(self):
+        """Print the current room's description, items, characters, and exits (with 'out' in Foyer)."""
+        print(f"You are in the {self.current_room.get_name()}")
+        print(self.current_room.get_description())
+        if self.current_room.get_item():
+            self.current_room.get_item().describe()
+        if self.current_room.get_character():
+            print(f"You see {self.current_room.get_character().get_name()} here.")
+        exits = list(self.current_room.linked_rooms.keys())
+        if self.current_room.get_name() == "Foyer" and "out" not in exits:
+            exits.append("out")
+        print(f"Exits: {', '.join(exits)}")
+
     def move(self, direction):
         new_room = self.current_room.move(direction)
         if new_room != self.current_room:
             self.current_room = new_room
-            print("You move to the " + self.current_room.get_name())
-            self.current_room.describe()
+            print(f"You move to the {self.current_room.get_name()}")
+            self.display_current_room()
         else:
+            print("You can't go that way.")
             print("You stay where you are.")
 
     def get_current_weight(self):
