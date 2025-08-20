@@ -116,7 +116,7 @@ def main():
     player = Character("Player", rooms['foyer'])
     zlatko_defeated = False
 
-    print("Welcome to the Zlatkos Mansion!")
+    print("Welcome to Zlatkos Mansion!")
     print_help()
     player.display_current_room()
 
@@ -180,9 +180,6 @@ def main():
 
             else:
                 player.move(direction)
-
-        elif command == "look":
-            player.display_current_room()
 
         elif command == "talk":
             character = player.current_room.get_character()
