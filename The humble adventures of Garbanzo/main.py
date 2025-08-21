@@ -52,9 +52,9 @@ def setup_world():
     key3 = Key("Golden Key", "Main Door", short_name="key3")
     key3.set_description("A golden key with intricate engravings.")
 
-    potion_small = HealthPotion("Small Health Potion", short_name="potion")
+    potion_small = HealthPotion("Small Health Potion", short_name="potion", heal_amount=50, weight=1)
     potion_small.set_description("A small vial filled with red liquid. Restores some health.")
-    potion_large = HealthPotion("Large Health Potion", short_name="bigpotion")
+    potion_large = HealthPotion("Large Health Potion", short_name="bigpotion", heal_amount=80, weight=2)
     potion_large.set_description("A large vial that restores a significant amount of health.")
 
     torch = Torch("Wooden Torch", short_name="torch")
@@ -62,17 +62,17 @@ def setup_world():
 
     sword = Weapon("Rusty Sword", "An old sword with a dull blade.", 4, 0, damage=10, weapon_type="Melee", short_name="sword")
     shotgun = Weapon("Shotgun", "A powerful shotgun with limited shells.", 7, 0, damage=35, weapon_type="Ranged", short_name="shotgun")
-    laser_pistol = Weapon("Laser Pistol", "Small laser pistol.", 3, 0, damage=12, weapon_type="Ranged", short_name="laser")
+    laser_pistol = Weapon("Laser Pistol", "Small laser pistol.", 3, 0, damage=12, weapon_type="Ranged", short_name="pistol")
 
 
-    rooms['kitchen'].set_item(potion_small)
-    rooms['foyer'].set_item(torch)
-    rooms['bedroom'].set_item(key1)
-    rooms['attic'].set_item(shotgun)
-    rooms['study'].set_item(key2)
-    rooms['hallway'].set_item(potion_large)
-    rooms['library'].set_item(key3)
-    rooms['basement'].set_item(sword)
+    rooms['kitchen'].add_item(potion_small)
+    rooms['foyer'].add_item(torch)
+    rooms['bedroom'].add_item(key1)
+    rooms['attic'].add_item(shotgun)
+    rooms['study'].add_item(key2)
+    rooms['hallway'].add_item(potion_large)
+    rooms['library'].add_item(key3)
+    rooms['basement'].add_item(sword)
 
 
     luther = NPC("Luther", rooms['library'], "I can help you survive this place. Stay alert!")
@@ -217,7 +217,7 @@ def main():
                 player.pick_up()
             else:
                 requested_name = parts[1].lower()
-                item = player.current_room.get_item()
+                item = player.current_room.get_items()
                 if item and (requested_name == item.get_short_name() or requested_name == item.get_name().lower()):
                     player.pick_up()
                 else:
@@ -249,5 +249,4 @@ def main():
         else:
             print("I don't understand that command. Type 'help' for a list of commands.")
 
-if __name__ == "__main__":
-    main()
+main()

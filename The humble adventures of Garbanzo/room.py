@@ -4,13 +4,17 @@ class Room:
         self.description = None
         self.linked_rooms = {}
         self.character = None
-        self.item = None
+        self.items = []
 
-    def set_item(self, item):
-        self.item = item
+    def get_items(self):
+        return self.items
 
-    def get_item(self):
-        return self.item
+    def add_item(self, item):
+        self.items.append(item)
+
+    def remove_item(self, item):
+        if item in self.items:
+            self.items.remove(item)
 
     def set_description(self, room_description):
         self.description = room_description
@@ -35,8 +39,9 @@ class Room:
 
     def describe(self):
         print(self.description)
-        if self.item:
-            self.item.describe()
+        if self.items:
+            for item in self.items:
+                item.describe()
         if self.character:
             print("You see " + self.character.get_name() + " here.")
         if self.linked_rooms:

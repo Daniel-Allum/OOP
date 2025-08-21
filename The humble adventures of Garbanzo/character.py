@@ -23,8 +23,10 @@ class Character:
         """Print the current room's description, items, characters, and exits (with 'out' in Foyer)."""
         print(f"You are in the {self.current_room.get_name()}")
         print(self.current_room.get_description())
-        if self.current_room.get_item():
-            self.current_room.get_item().describe()
+        items_in_room = self.current_room.get_items()
+        if items_in_room:
+            for item in items_in_room:
+                item.describe()
         if self.current_room.get_character():
             print(f"You see {self.current_room.get_character().get_name()} here.")
         exits = list(self.current_room.linked_rooms.keys())
@@ -46,10 +48,11 @@ class Character:
         return sum(item.get_weight() for item in self.inventory)
 
     def pick_up(self):
-        item = self.current_room.get_item()
-        if item is None:
+        items_in_room = self.current_room.get_items()
+        if not items_in_room:
             print("There is nothing here to pick up.")
             return
+        item = items_in_room[0]
         if not item.get_can_pick_up():
             print("You can't pick that up.")
             return
@@ -57,14 +60,14 @@ class Character:
             print("You're overburdened and can't carry that.")
             return
         self.inventory.append(item)
-        self.current_room.set_item(None)
+        self.current_room.remove_item(item)
         print(f"You picked up the {item.get_name()}")
 
     def drop_item(self, item_short_name):
         for item in self.inventory:
             if item.get_short_name() == item_short_name.lower():
                 self.inventory.remove(item)
-                self.current_room.set_item(item)
+                self.current_room.add_item(item)
                 print(f"You dropped the {item.get_name()}")
                 return
         print("You don't have that item.")
@@ -81,7 +84,6 @@ class Character:
         if self.health > self.max_health:
             self.health = self.max_health
         print(f"Your health is now: {self.health}")
-
 
 
 class NPC(Character):
@@ -114,4 +116,4 @@ class Enemy(Character):
     def on_defeat(self):
         if self.drop_item:
             print(f"{self.name} dropped {self.drop_item.get_name()}!")
-            self.current_room.set_item(self.drop_item)
+            self.current_room.add_item(self.drop_item)

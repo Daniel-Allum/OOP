@@ -45,13 +45,15 @@ class Item:
 
 
 class HealthPotion(Item):
-    def __init__(self, name, description=None, weight=1, value=0, short_name=None):
-        super().__init__(name, description, weight, value, short_name)
+    def __init__(self, name, heal_amount=20, weight=1, description=None, short_name=None):
+        super().__init__(name, description=description, weight=weight, short_name=short_name)
+        self.heal_amount = heal_amount
 
     def use(self, player):
-        print(f"You drink the {self.name}. You feel refreshed!")
-        player.heal(20)
-        player.inventory.remove(self)
+        player.health = min(player.max_health, player.health + self.heal_amount)
+        print(f"You used {self.name} and restored {self.heal_amount} HP! Your health is now {player.health}.")
+        if self in player.inventory:
+            player.inventory.remove(self)
 
 
 class Key(Item):
